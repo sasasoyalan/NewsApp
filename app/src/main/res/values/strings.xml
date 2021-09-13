@@ -6,4 +6,5 @@
     <string name="title_detail">İçerik</string>
     <string name="read_news"><u>Haberi Oku</u></string>
     <string name="haber_kayna_na_git"><u>Haber Kaynağına git</u></string>
+    <string name="settings">Ayarlar</string>
 </resources>
