@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">NewsApp</string>
+    <string name="title_home">Genel</string>
+    <string name="title_dashboard">Spor</string>
+    <string name="title_notifications">Teknoloji</string>
+    <string name="title_detail">İçerik</string>
+    <string name="read_news"><u>Haberi Oku</u></string>
+    <string name="haber_kayna_na_git"><u>Haber Kaynağına git</u></string>
+</resources>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+app:cardCornerRadius="3dp"
+app:cardElevation="3dp"
+app:cardBackgroundColor="#3c3f41"
+app:cardUseCompatPadding="true">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/txt_newsId"
+        android:layout_width="match_parent"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="#3c3f41"
+        app:layout_constraintBottom_toTopOf="@+id/recyc_detail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/birim"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.35"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Birim Adı"
+            android:textColor="#e8e4c9">
+        </TextView>
+        <LinearLayout
+            android:id="@+id/yon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.15"
+            android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/birim"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Yön"
+            android:orientation="vertical"
+            android:textColor="#e8e4c9">
+
+            <ImageView
+                android:id="@+id/img_yon"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:background="@drawable/arrow_up">
+            </ImageView>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/fiyat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.25"
+            android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/yon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Fiyat"
+            android:textColor="#2acb8d">
+        </TextView>
+        <TextView
+            android:id="@+id/degisim"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.25"
+            android:gravity="center"
+            android:background="@drawable/red_backgorund"
+            app:layout_constraintStart_toEndOf="@id/fiyat"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Değişim (%)"
+            android:textColor="#e8e4c9">
+        </TextView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
