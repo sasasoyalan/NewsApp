@@ -1,17 +1,13 @@
 package com.sssoyalan.newsapp.adapters
 
-import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sssoyalan.newsapp.R
-import com.sssoyalan.newsapp.models.Borsalar
 import com.sssoyalan.newsapp.models.modelInside
-import com.sssoyalan.newsapp.ui.DetailActivity
 import kotlinx.android.synthetic.main.item_recyc_detail.view.*
-import kotlinx.android.synthetic.main.item_recyclerview_borsa.view.*
 
 class BorsaAdapterDetail(private val mList: List<modelInside>) : RecyclerView.Adapter<BorsaAdapterDetail.ViewHolder>() {
 

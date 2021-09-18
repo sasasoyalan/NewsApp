@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottomSheetContainer"
+    android:background="@drawable/version_backgrund"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="Uygulamanız güncel değil.\nLütfen güncelleyin."
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="18sp">
+    </TextView>
+
+    <Button
+        android:id="@+id/btn_update"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginEnd="100dp"
+        android:layout_width="120dp"
+        android:backgroundTint="#00b359"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="Güncelle">
+    </Button>
+
+</LinearLayout>

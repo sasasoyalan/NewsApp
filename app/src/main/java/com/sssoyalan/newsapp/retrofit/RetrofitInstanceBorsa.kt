@@ -1,5 +1,6 @@
 package com.sssoyalan.newsapp.retrofit
 
+import com.sssoyalan.newsapp.api.RetrofitApi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

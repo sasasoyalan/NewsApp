@@ -1,10 +1,22 @@
 <resources>
-    <string name="app_name">NewsApp</string>
-    <string name="title_home">Genel</string>
-    <string name="title_dashboard">Spor</string>
-    <string name="title_notifications">Teknoloji</string>
+    <string name="app_name">BiHaber</string>
+    <string name="title_home">Haberler</string>
+    <string name="title_dashboard">Kaydedilmiş</string>
+    <string name="title_notifications">Kullanıcılar</string>
+    <string name="title_profile">Profil</string>
     <string name="title_detail">İçerik</string>
     <string name="read_news"><u>Haberi Oku</u></string>
     <string name="haber_kayna_na_git"><u>Haber Kaynağına git</u></string>
     <string name="settings">Ayarlar</string>
+    <string name="favorilre_ekle"><u>Kaydet</u></string>
+
+    <string name="facebook_app_id">[APP_ID]</string>
+    <string name="fb_login_protocol_scheme">fb[APP_ID]</string>
+
+    <string name="google_logout">Çıkış Yap</string>
+
+    <!--to toggle the open close button
+        of the navigation drawer-->
+    <string name="nav_open">Aç</string>
+    <string name="nav_close">Kapat</string>
 </resources>

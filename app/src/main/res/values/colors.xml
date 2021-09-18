@@ -10,4 +10,23 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#D13B3B</color>
     <color name="green">#2acb8d</color>
+
+    <color name="yellow">#eeee00</color>
+
+    <color name="red1">#E50000</color>
+    <color name="red_close">#F2E1392E</color>
+    <color name="purple">#8B1C62</color>
+
+
+    <color name="grand">#314d47</color>
+
+    <color name="tab_background_selected">#D81C86EE</color>
+    <color name="tab_background_unselected">#dcf3ff</color>
+
+    <color name="green_300">#81c784</color>
+    <color name="blue_grey_900">#263238</color>
+    <color name="green_400">#66bb6a</color>
+    <color name="blue_grey_500">#607d8b</color>
+    <color name="blue_grey_300">#90a4ae</color>
+    <color name="blue_grey_400">#78909c</color>
 </resources>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#3c3f41"
-    tools:context=".ui.DetailActivity">
+    tools:context=".ui.activities.DetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -22,10 +22,9 @@
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/AppTheme">
             <ImageView
-                android:layout_width="180dp"
-                android:layout_height="45dp"
+                android:layout_width="90dp"
+                android:layout_height="40dp"
                 android:src="@drawable/app_logo"
-                android:padding="8dp"
                 android:id="@+id/circle_imageView"/>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

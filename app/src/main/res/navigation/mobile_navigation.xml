@@ -7,22 +7,29 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.sssoyalan.newsapp.ui.general.HomeFragment"
+        android:name="com.sssoyalan.newsapp.ui.fragments.NewsFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_news" >
     </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.sssoyalan.newsapp.ui.sport.DashboardFragment"
+        android:name="com.sssoyalan.newsapp.ui.fragments.SavedFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" >
+        tools:layout="@layout/fragment_saved" >
     </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.sssoyalan.newsapp.ui.technology.NotificationsFragment"
+        android:name="com.sssoyalan.newsapp.ui.fragments.UsersFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" >
+        tools:layout="@layout/fragment_users" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.sssoyalan.newsapp.ui.fragments.ProfileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" >
     </fragment>
 </navigation>
