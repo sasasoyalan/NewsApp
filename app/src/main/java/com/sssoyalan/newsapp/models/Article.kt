@@ -17,17 +17,3 @@ data class Article(
     var fav : Boolean?,
     val urlToImage: String?
 ) : Serializable
-
-@Entity(tableName = "article_fav")
-data class ArticleFav(
-    @PrimaryKey( autoGenerate = true ) val uId: Int? = null,
-    val author: String?,
-    val content: String?,
-    val description: String?,
-    val publishedAt: String?,
-    val source: Source?,
-    val title: String?,
-    val url: String?,
-    var fav : Boolean?,
-    val urlToImage: String?
-) : Serializable

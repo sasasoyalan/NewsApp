@@ -31,8 +31,11 @@ import com.sssoyalan.newsapp.R
 import com.sssoyalan.newsapp.databinding.ActivityLoginBinding
 import com.sssoyalan.newsapp.db.ArticleDatabase
 import com.sssoyalan.newsapp.generic.VersionChecker
+import com.sssoyalan.newsapp.models.Article
+import com.sssoyalan.newsapp.models.Source
 import com.sssoyalan.newsapp.models.users.Okunan
 import com.sssoyalan.newsapp.models.users.UserModel
+import com.sssoyalan.newsapp.models.users.lastReadArticle
 import com.sssoyalan.newsapp.source.DataRepository
 import java.util.concurrent.ExecutionException
 
@@ -143,8 +146,12 @@ class LoginActivity : AppCompatActivity() {
                                     account.id.toString(),
                                     account.displayName.toString(),
                                     account.email.toString(),
+                                    "1",
                                     account.photoUrl.toString(),
-                                    Okunan()
+                                        "1",
+                                        "1",
+                                    Okunan(),
+                                    lastReadArticle("","","","")
                                 ), this
                             )
                         }

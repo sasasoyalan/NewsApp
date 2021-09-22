@@ -41,7 +41,7 @@ class SavedFragment : Fragment() {
         _binding = FragmentSavedBinding.inflate(inflater,container,false)
         val view = binding.root
 
-        val slideUp: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_appbar)
+        val slideUp: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_appbar_)
         (activity as MainActivity).appBar.visibility = View.VISIBLE
         (activity as MainActivity).appBar.startAnimation(slideUp)
 

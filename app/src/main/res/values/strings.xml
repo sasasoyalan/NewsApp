@@ -19,4 +19,5 @@
         of the navigation drawer-->
     <string name="nav_open">Aç</string>
     <string name="nav_close">Kapat</string>
+    <string name="title_weather">Hava Durumu</string>
 </resources>

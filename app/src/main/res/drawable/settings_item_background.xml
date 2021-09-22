@@ -7,8 +7,7 @@
     </stroke>
 
     <corners
-        android:radius="10dp"
-        />
+        android:radius="10dp" />
 
     <gradient
         android:angle="270"

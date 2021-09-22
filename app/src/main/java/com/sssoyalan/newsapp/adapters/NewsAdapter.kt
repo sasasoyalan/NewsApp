@@ -25,6 +25,12 @@ class NewsAdapter(val mList: List<Article>, private val homeFragment: NewsFragme
 
         val itemsViewModel = mList[position]
 
+        if (position==mList.size-1||position==mList.size-2){
+            val param = holder.itemView.layoutParams as ViewGroup.MarginLayoutParams
+            param.setMargins(0,0,0,250)
+            holder.itemView.layoutParams = param
+        }
+
         holder.itemView.apply {
             if (itemsViewModel.source?.name!= null){
                 txt_newsId.text = itemsViewModel.source.name

@@ -3,10 +3,13 @@ package com.sssoyalan.newsapp.ui.activities
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,7 +61,6 @@ class DetailActivity : AppCompatActivity() {
             goDetail()
         }else if(intent.extras?.getSerializable("object") is Borsalar){
             goBorsa()
-            hideProgressBar()
         }
     }
 
@@ -74,6 +76,7 @@ class DetailActivity : AppCompatActivity() {
             )
             recyc_detail.adapter = BorsaAdapterDetail(borsalar.borsalar)
         }
+        hideProgressBar()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -96,17 +99,26 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (webView.canGoBack())
-            webView.goBack()
-        else
-            super.onBackPressed()
-    }
-
     fun hideProgressBar() {
         paginationProgressBarMain.visibility = View.INVISIBLE
     }
     fun showProgressBar() {
         paginationProgressBarMain.visibility = View.VISIBLE
+    }
+
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed()
+            return
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "Uygulamaya dönmek için bir kez daha dokunun", Toast.LENGTH_SHORT).show()
+        if (webView.canGoBack()){
+            webView.goBack()
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 1500)
     }
 }

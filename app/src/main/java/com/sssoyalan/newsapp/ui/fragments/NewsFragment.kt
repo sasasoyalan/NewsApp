@@ -12,6 +12,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -119,7 +120,7 @@ class NewsFragment : Fragment() {
         })
 
 
-        val slideUp: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_appbar)
+        val slideUp: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_appbar_)
         val slideDown: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down_appbar)
 
         binding.recyc2.addOnScrollListener(object : MyRecyclerScroll() {
@@ -131,6 +132,7 @@ class NewsFragment : Fragment() {
                 ).start()
                 (activity as MainActivity).appBar.visibility = View.GONE
                 (activity as MainActivity).appBar.startAnimation(slideDown)
+
             }
 
             override fun hide() {
@@ -139,6 +141,7 @@ class NewsFragment : Fragment() {
                     .setInterpolator(AccelerateInterpolator(2f)).start()
                 (activity as MainActivity).appBar.visibility = View.VISIBLE
                 (activity as MainActivity).appBar.startAnimation(slideUp)
+
             }
         })
         return view

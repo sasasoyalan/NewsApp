@@ -10,18 +10,77 @@
     app:contentInsetStart="0dp"
     android:layout_width="match_parent"
     app:layout_scrollFlags="scroll|enterAlways"
-    android:layout_height="45dp"
+    android:layout_height="wrap_content"
     app:ignore="NamespaceTypo">
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start">
+            android:layout_height="wrap_content">
 
                 <ImageView
                     android:layout_width="90dp"
                     android:layout_height="40dp"
+                    myapp:layout_constraintTop_toTopOf="parent"
+                    myapp:layout_constraintStart_toStartOf="parent"
+                    myapp:layout_constraintBottom_toBottomOf="parent"
                     android:src="@drawable/app_logo"
                     android:id="@+id/circle_imageView"/>
 
-        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            myapp:layout_constraintEnd_toEndOf="parent"
+                            myapp:layout_constraintTop_toTopOf="parent"
+                            android:gravity="center"
+                            myapp:layout_constraintBottom_toBottomOf="parent"
+                            android:orientation="horizontal">
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:layout_width="55dp"
+                                    android:layout_height="55dp"
+                                    android:padding="5dp"
+                                    myapp:layout_constraintTop_toTopOf="parent"
+                                    myapp:layout_constraintEnd_toStartOf="@id/main_degree"
+                                    myapp:layout_constraintBottom_toBottomOf="parent">
+
+                                        <de.hdodenhof.circleimageview.CircleImageView
+                                            android:layout_width="50dp"
+                                            android:layout_height="50dp"
+                                            myapp:layout_constraintTop_toTopOf="parent"
+                                            myapp:layout_constraintEnd_toEndOf="parent"
+                                            myapp:layout_constraintBottom_toBottomOf="parent"
+                                            myapp:layout_constraintStart_toStartOf="parent"
+                                            android:id="@+id/circle_imageView_main"/>
+
+                                        <de.hdodenhof.circleimageview.CircleImageView
+                                            android:layout_width="50dp"
+                                            android:layout_height="50dp"
+                                            myapp:layout_constraintTop_toTopOf="parent"
+                                            myapp:layout_constraintEnd_toEndOf="parent"
+                                            myapp:layout_constraintBottom_toBottomOf="parent"
+                                            myapp:layout_constraintStart_toStartOf="parent"
+                                            android:id="@+id/circle_imageView_effect"/>
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                                <TextView
+                                    android:id="@+id/main_degree"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    myapp:layout_constraintTop_toTopOf="parent"
+                                    myapp:layout_constraintEnd_toEndOf="parent"
+                                    android:textSize="16dp"
+                                    android:layout_gravity="center"
+                                    android:gravity="center"
+                                    android:textColor="@color/white"
+                                    android:text="Yükleniyor..."
+                                    android:layout_marginEnd="10dp"
+                                    myapp:layout_constraintBottom_toBottomOf="parent">
+                                </TextView>
+
+                        </LinearLayout>
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.appcompat.widget.Toolbar>

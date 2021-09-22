@@ -1,8 +1,15 @@
 package com.sssoyalan.newsapp.ui.activities
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.view.animation.DecelerateInterpolator
@@ -12,6 +19,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
@@ -20,14 +28,16 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.github.matteobattilana.weather.PrecipType
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.location.*
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.*
 import com.sssoyalan.newsapp.MainViewModel
 import com.sssoyalan.newsapp.MainViewModelFactory
 import com.sssoyalan.newsapp.R
@@ -36,10 +46,13 @@ import com.sssoyalan.newsapp.db.ArticleDatabase
 import com.sssoyalan.newsapp.generic.Constants
 import com.sssoyalan.newsapp.generic.Constants.*
 import com.sssoyalan.newsapp.models.Borsalar
+import com.sssoyalan.newsapp.models.Resource
 import com.sssoyalan.newsapp.models.users.UserModel
 import com.sssoyalan.newsapp.source.DataRepository
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_layout.*
+import kotlinx.android.synthetic.main.toolbar_actionbar.*
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -49,11 +62,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var appBar: AppBarLayout
     lateinit var actionBarDrawerToggle : ActionBarDrawerToggle
     private lateinit var drawerLayout : DrawerLayout
+    val PERMISSION_ID = 42
+    lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private var firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
 
     companion object {
         var SPEED = 20
         var REVERSE = false
         var isActive = true
+        var isEmail = "1"
+        var isOnline = "1"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +85,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         appBar = findViewById(R.id.app_bar)
 
+        firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
+
         drawerLayout = findViewById(R.id.my_drawer_layout)
         actionBarDrawerToggle =
             ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close)
@@ -74,14 +94,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         actionBarDrawerToggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        getLastLocation()
+
+
         val googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this)
         if (googleSignInAccount!=null){
             USER_NAME = googleSignInAccount.displayName
             USER_EMAIL = googleSignInAccount.email
             USER_IMG_URL = googleSignInAccount.photoUrl
             USER_ID = googleSignInAccount.id
-            val firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
-            firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
             firestore.collection("users").document(Constants.USER_ID)
                 .get()
                 .addOnSuccessListener { result ->
@@ -129,23 +151,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.itemTextColor = null
 
         goRefresh()
+        lastSeenUpdate("1")
     }
 
     override fun onResume() {
         super.onResume()
         isActive =true
+        lastSeenUpdate("1")
     }
 
     override fun onRestart() {
         super.onRestart()
         isActive =true
+        lastSeenUpdate("1")
     }
 
     override fun onStart() {
         super.onStart()
         isActive=true
+        lastSeenUpdate("1")
     }
 
+    override fun onStop() {
+        super.onStop()
+        val time : Long = Timestamp.now().toDate().time
+        lastSeenUpdate(time.toString())
+    }
 
     fun goRefresh() {
         viewModel.aliveDataBorsa.observe(this) {
@@ -198,6 +229,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showDialog() {
 
         val bottomSheetDialog =
@@ -213,11 +245,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val radioG = bottomSheetView.findViewById(R.id.radio_group) as RadioGroup
         val radioBtnLeft = bottomSheetView.findViewById(R.id.radioSol) as RadioButton
         val radioBtnRight = bottomSheetView.findViewById(R.id.radioSag) as RadioButton
+        val cb_email = bottomSheetView.findViewById(R.id.cb_email) as CheckBox
+        val cb_online = bottomSheetView.findViewById(R.id.cb_son_gorulme) as CheckBox
         val cancelBtn = bottomSheetView.findViewById(R.id.cancel_btn) as AppCompatImageButton
         val saveBtn = bottomSheetView.findViewById(R.id.save_btn) as AppCompatImageButton
 
         seekBar.progress = SPEED /10
         tv_speed.text = seekBar.progress.toString()+"x"
+
+        val firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
+        val docIdRef: DocumentReference = firestore.collection("users").document(USER_ID)
+        docIdRef.get().addOnSuccessListener {
+            if (it.exists()){
+                cb_email.isChecked = it.getString("userEmailCheck")=="1"
+                cb_online.isChecked = it.getString("onlineCheck")=="1"
+            }
+        }
 
         if (!REVERSE){
             tv_yon.text = "Sol"
@@ -256,6 +299,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             bottomSheetDialog.dismiss()
         }
         saveBtn.setOnClickListener {
+            isEmail = if (cb_email.isChecked){
+                "1"
+            }else{
+                "0"
+            }
+            isOnline = if (cb_online.isChecked){
+                "1"
+            }else{
+                "0"
+            }
+
+            firestore.collection("users").document(USER_ID)
+                .update(mapOf(
+                        "userEmailCheck" to isEmail,
+                        "onlineCheck" to isOnline
+                ))
+                .addOnSuccessListener { Log.d("TAG", "DocumentSnapshot successfully updated!") }
+                .addOnFailureListener { e -> Log.w("TAG", "Error updating document", e) }
+
             isActive=true
             SPEED = seekBar.progress*10
             startScroll()
@@ -265,13 +327,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             editor.putBoolean("reverse", REVERSE)
             editor.apply()
             bottomSheetDialog.dismiss()
-            val intent = intent
-            finish()
-            startActivity(intent)
+            recreate()
         }
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
 
+    }
+
+    private fun lastSeenUpdate(s: String){
+        firestore.collection("users").document(USER_ID)
+                .update("online", s)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -305,6 +370,146 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLastLocation() {
+        if (checkPermissions()) {
+            if (isLocationEnabled()) {
+
+                mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                    var location: Location? = task.result
+                    if (location == null) {
+                        requestNewLocationData()
+                    } else {
+//                        findViewById<TextView>(R.id.latTextView).text = location.latitude.toString()
+//                        findViewById<TextView>(R.id.lonTextView).text = location.longitude.toString()
+                        /*Buradan istek atmalıyım mal değilsem eğer.*/
+                        goResfreshWeather(location.latitude.toString(), location.longitude.toString())
+                        Log.d(
+                            "TAGsss",
+                            "${location.latitude.toString()} => ${location.longitude.toString()}"
+                        )
+                    }
+                }
+            } else {
+                Toast.makeText(
+                    this,
+                    "Konum bilgisini açmanız gerekli",
+                    Toast.LENGTH_LONG
+                ).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            }
+        } else {
+            requestPermissions()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun goResfreshWeather(lat: String, lon: String) {
+        viewModel.getWeatherData(lat, lon)
+        viewModel.aliveDataWeather.observe(this, androidx.lifecycle.Observer {
+            when (it) {
+                is Resource.Success -> {
+                    if (it.data != null) {
+
+                        when  {
+                            it.data.weather[0].main.toString().contains("Clear") -> {
+                                circle_imageView_effect.setBackgroundResource(R.drawable.sun_effect)
+                            }
+                            it.data.weather[0].main.toString().contains("Smoke") -> {
+                                circle_imageView_effect.setBackgroundResource(R.drawable.smoke_effect)
+                            }
+                        }
+
+                        Glide.with(this)
+                            .load("https://openweathermap.org/img/wn/" + it.data.weather[0].icon.toString() + "@2x.png")
+                            .into(
+                                circle_imageView_main
+                            )
+                        main_degree.text= String.format("%.2f ℃",it.data.main.temp-272.15)
+                    }
+                }
+                is Resource.Error -> {
+                    it.message?.let {
+                        Toast.makeText(
+                            this,
+                            "Bedava sürüm olduğundan dolayı haber limiti doldu , yarın düzelir :D",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        })
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestNewLocationData() {
+        var mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 0
+        mLocationRequest.fastestInterval = 0
+        mLocationRequest.numUpdates = 1
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        mFusedLocationClient.requestLocationUpdates(
+            mLocationRequest, mLocationCallback,
+            Looper.myLooper()
+        )
+    }
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            var mLastLocation: Location = locationResult.lastLocation
+            goResfreshWeather(mLastLocation.latitude.toString(), mLastLocation.longitude.toString())
+        }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        var locationManager: LocationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
+    }
+
+    private fun checkPermissions(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ),
+            PERMISSION_ID
+        )
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == PERMISSION_ID) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                getLastLocation()
+            }
+        }
     }
 
 }
