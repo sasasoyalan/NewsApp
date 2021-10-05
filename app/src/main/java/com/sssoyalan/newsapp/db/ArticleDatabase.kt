@@ -5,8 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.sssoyalan.newsapp.generic.SourceTypeConverter
-import com.sssoyalan.newsapp.models.Article
+import com.sssoyalan.newsapp.helpers.SourceTypeConverter
+import com.sssoyalan.newsapp.models.news.Article
 
 @Database(entities = [Article::class], version = 1)
 @TypeConverters(SourceTypeConverter::class)

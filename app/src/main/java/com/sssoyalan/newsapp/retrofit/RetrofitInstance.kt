@@ -1,6 +1,5 @@
 package com.sssoyalan.newsapp.retrofit
 
-import com.sssoyalan.newsapp.api.RetrofitApi
 import com.sssoyalan.newsapp.util.Constant
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

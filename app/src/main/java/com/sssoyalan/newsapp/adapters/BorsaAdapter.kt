@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sssoyalan.newsapp.R
-import com.sssoyalan.newsapp.models.modelInside
+import com.sssoyalan.newsapp.models.borsa.modelInside
 import kotlinx.android.synthetic.main.item_recyclerview_borsa.view.*
 
 class BorsaAdapter(private val mList: List<modelInside>) : RecyclerView.Adapter<BorsaAdapter.ViewHolder>() {

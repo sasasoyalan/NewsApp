@@ -18,8 +18,8 @@ import com.sssoyalan.newsapp.adapters.NewsAdapter
 import com.sssoyalan.newsapp.MainViewModel
 import com.sssoyalan.newsapp.R
 import com.sssoyalan.newsapp.databinding.FragmentSavedBinding
-import com.sssoyalan.newsapp.generic.MyRecyclerScroll
-import com.sssoyalan.newsapp.models.Article
+import com.sssoyalan.newsapp.helpers.MyRecyclerScroll
+import com.sssoyalan.newsapp.models.news.Article
 import com.sssoyalan.newsapp.ui.activities.MainActivity
 
 class SavedFragment : Fragment() {
@@ -51,6 +51,8 @@ class SavedFragment : Fragment() {
             refreshAction()                    // refresh your list contents somehow
             binding.swipeContainer.isRefreshing = false   // reset the SwipeRefreshLayout (stop the loading spinner)
         }
+
+        (activity as MainActivity).isNotWeather()
 
         if (articles.isEmpty()){
             binding.noFoundLayout.visibility=View.VISIBLE
@@ -120,7 +122,7 @@ class SavedFragment : Fragment() {
     }
 
     private fun refreshAction() {
-        (activity as MainActivity).goRefresh()
+        (activity as MainActivity).goRefresh(true)
     }
 
 

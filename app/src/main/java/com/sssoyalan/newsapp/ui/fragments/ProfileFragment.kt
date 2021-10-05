@@ -12,8 +12,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sssoyalan.newsapp.R
 import com.sssoyalan.newsapp.databinding.FragmentProfileBinding
-import com.sssoyalan.newsapp.generic.Constants
-import com.sssoyalan.newsapp.generic.Constants.USER_ID
+import com.sssoyalan.newsapp.helpers.Constants
+import com.sssoyalan.newsapp.helpers.Constants.USER_ID
 import com.sssoyalan.newsapp.ui.activities.MainActivity
 
 class ProfileFragment : Fragment() {
@@ -34,6 +34,8 @@ class ProfileFragment : Fragment() {
         (activity as MainActivity).appBar.startAnimation(slideUp)
 
         binding.username.text= Constants.USER_NAME
+
+        (activity as MainActivity).isNotWeather()
 
         val firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
         val docIdRef: DocumentReference = firestore.collection("users").document(USER_ID)

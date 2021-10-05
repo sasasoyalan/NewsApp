@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sssoyalan.newsapp.R
-import com.sssoyalan.newsapp.models.Article
+import com.sssoyalan.newsapp.models.news.Article
 import com.sssoyalan.newsapp.ui.activities.DetailActivity
 import com.sssoyalan.newsapp.ui.fragments.NewsFragment
 import kotlinx.android.synthetic.main.item_recyclerview.view.*

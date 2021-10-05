@@ -56,6 +56,32 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/vw">
 
+            <TextView
+                android:id="@+id/okunan_haber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/user_okunan"
+                android:textSize="8sp"
+                android:text="Okunan Haber">
+            </TextView>
+
+            <TextView
+                android:id="@+id/user_okunan"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                app:layout_constraintTop_toBottomOf="@+id/okunan_haber"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:text="10"
+                android:background="@drawable/shadow_effect"
+                app:layout_constraintEnd_toStartOf="@id/img_okuyucu">
+            </TextView>
+
             <ImageView
                 android:id="@+id/img_okuyucu"
                 android:layout_width="30dp"

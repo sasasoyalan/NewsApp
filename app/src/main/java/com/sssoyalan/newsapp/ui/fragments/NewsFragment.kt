@@ -12,7 +12,6 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -26,9 +25,9 @@ import com.sssoyalan.newsapp.adapters.CategoryAdapter
 import com.sssoyalan.newsapp.adapters.NewsAdapter
 import com.sssoyalan.newsapp.databinding.FragmentNewsBinding
 import com.sssoyalan.newsapp.db.ArticleDatabase
-import com.sssoyalan.newsapp.generic.MyRecyclerScroll
-import com.sssoyalan.newsapp.models.Article
-import com.sssoyalan.newsapp.models.CategoryInside
+import com.sssoyalan.newsapp.helpers.MyRecyclerScroll
+import com.sssoyalan.newsapp.models.news.Article
+import com.sssoyalan.newsapp.models.news.CategoryInside
 import com.sssoyalan.newsapp.models.Resource
 import com.sssoyalan.newsapp.source.DataRepository
 import com.sssoyalan.newsapp.ui.activities.MainActivity
@@ -75,6 +74,8 @@ class NewsFragment : Fragment() {
             refreshAction()                    // refresh your list contents somehow
             binding.swipeContainer.isRefreshing = false   // reset the SwipeRefreshLayout (stop the loading spinner)
         }
+
+        (activity as MainActivity).isNotWeather()
 
         binding.recycCategory.layoutManager = LinearLayoutManager(
             requireContext(),
@@ -187,7 +188,7 @@ class NewsFragment : Fragment() {
 
     private fun refreshAction() {
         goResfresh()
-        (activity as MainActivity).goRefresh()
+        (activity as MainActivity).goRefresh(true)
     }
 
     fun goResfresh(categoryInside: CategoryInside = CategoryInside(3, "Genel", "general")) {

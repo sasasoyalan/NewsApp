@@ -77,12 +77,27 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            android:id="@+id/tv_uyari"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:text="Silmek için sola veya sağa\n kaydırabilirsiniz."
+            android:drawableStart="@drawable/ic_baseline_keyboard_arrow_left_24"
+            android:drawableEnd="@drawable/ic_baseline_chevron_right_24">
+        </TextView>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyc2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_uyari"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="5dp"
@@ -90,7 +105,7 @@
             android:layoutAnimation="@anim/layout_animaion"
             tools:listitem="@layout/item_recyclerview"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="4dp">
         </androidx.recyclerview.widget.RecyclerView>
 

@@ -91,7 +91,7 @@
             android:layoutAnimation="@anim/layout_animaion"
             tools:listitem="@layout/item_recyclerview"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="4dp">
         </androidx.recyclerview.widget.RecyclerView>
 

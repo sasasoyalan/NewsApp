@@ -6,11 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sssoyalan.newsapp.R
-import com.sssoyalan.newsapp.generic.LastSeenTime
+import com.sssoyalan.newsapp.helpers.LastSeenTime
 import com.sssoyalan.newsapp.models.users.UserModel
 import kotlinx.android.synthetic.main.item_user.view.*
 
@@ -35,6 +34,7 @@ class UsersAdapter(private val mList: List<UserModel>) : RecyclerView.Adapter<Re
         }
         holder.itemView.apply {
             user_name.text=item.userName
+            user_okunan.text = item.okunan?.okunanTotal.toString()
             if (item.userEmailCheck.toString() == "1"){
                 user_email.text=item.userEmail
             }

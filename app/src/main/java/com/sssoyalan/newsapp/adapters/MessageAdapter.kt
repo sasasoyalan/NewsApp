@@ -1,20 +1,14 @@
 package com.sssoyalan.newsapp.adapters
 
-import android.graphics.Color
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.sssoyalan.newsapp.R
-import com.sssoyalan.newsapp.generic.Constants
-import com.sssoyalan.newsapp.generic.LastSeenTime
-import com.sssoyalan.newsapp.models.MessageModel
-import com.sssoyalan.newsapp.models.users.UserModel
+import com.sssoyalan.newsapp.helpers.Constants
+import com.sssoyalan.newsapp.helpers.LastSeenTime
+import com.sssoyalan.newsapp.models.message.MessageModel
 import kotlinx.android.synthetic.main.item_chat.view.*
-import kotlinx.android.synthetic.main.item_user.view.*
 
 class MessageAdapter(private val mList: List<MessageModel>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {}

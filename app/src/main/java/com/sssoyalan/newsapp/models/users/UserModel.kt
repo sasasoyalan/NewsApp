@@ -1,8 +1,5 @@
 package com.sssoyalan.newsapp.models.users
 
-import com.sssoyalan.newsapp.models.Article
-import com.sssoyalan.newsapp.models.Source
-
 data class UserModel (
     var userId : String ="",
     var userName : String="",

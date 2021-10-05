@@ -1,21 +1,19 @@
 package com.sssoyalan.newsapp.ui.fragments
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -29,8 +27,8 @@ import com.sssoyalan.newsapp.adapters.MessageAdapter
 import com.sssoyalan.newsapp.adapters.UsersAdapter
 import com.sssoyalan.newsapp.databinding.FragmentUsersBinding
 import com.sssoyalan.newsapp.db.ArticleDatabase
-import com.sssoyalan.newsapp.generic.Constants
-import com.sssoyalan.newsapp.models.MessageModel
+import com.sssoyalan.newsapp.helpers.Constants
+import com.sssoyalan.newsapp.models.message.MessageModel
 import com.sssoyalan.newsapp.source.DataRepository
 import com.sssoyalan.newsapp.ui.activities.MainActivity
 
@@ -73,6 +71,7 @@ class UsersFragment : Fragment() {
         )
         (activity as MainActivity).appBar.visibility = View.VISIBLE
         (activity as MainActivity).appBar.startAnimation(slideUp)
+        (activity as MainActivity).isNotWeather()
 
         binding.recyc2.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -108,7 +107,7 @@ class UsersFragment : Fragment() {
 
     private fun refreshAction() {
         goResfresh()
-        (activity as MainActivity).goRefresh()
+        (activity as MainActivity).goRefresh(true)
     }
 
     private fun goResfresh() {
@@ -135,7 +134,6 @@ class UsersFragment : Fragment() {
         dialog.setCancelable(true)
         val edt_message = dialog.findViewById(R.id.input_message) as EditText
         val btn_send = dialog.findViewById(R.id.send_message) as ImageView
-        val hide_keyboard_layout = dialog.findViewById(R.id.hide_keyboard_layout) as ConstraintLayout
         val recyc_chat = dialog.findViewById(R.id.recyc_chat) as RecyclerView
 
         val  linearLayoutManager : LinearLayoutManager= LinearLayoutManager(requireContext())
@@ -147,30 +145,34 @@ class UsersFragment : Fragment() {
             recyc_chat.adapter = MessageAdapter(it)
         })
 
-        hide_keyboard_layout.setOnTouchListener { v, event ->
-            when (event?.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    hideKeyboard(edt_message)
-                }
-                }
-
-            v?.onTouchEvent(event) ?: true
-        }
-
         recyc_chat.setOnTouchListener { v, event ->
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
                     hideKeyboard(edt_message)
                 }
             }
-
             v?.onTouchEvent(event) ?: true
         }
+
+        edt_message.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER ) {
+                btn_send.performClick()
+                true
+            }
+            false
+        })
 
         btn_send.setOnClickListener {
             if (edt_message.text.toString().isNotEmpty()){
                 val time : Long = Timestamp.now().toDate().time
-                viewModel.saveMessage(MessageModel(Constants.USER_ID,edt_message.text.toString(),time.toString(),Constants.USER_NAME))
+                viewModel.saveMessage(
+                    MessageModel(
+                        Constants.USER_ID,
+                        edt_message.text.toString(),
+                        time.toString(),
+                        Constants.USER_NAME
+                    )
+                )
                 edt_message.setText("")
             }
         }
@@ -178,7 +180,7 @@ class UsersFragment : Fragment() {
 
     private fun hideKeyboard(view: View){
         val imm : InputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken,0)
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun showChatdialog() {

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -28,8 +29,8 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.github.matteobattilana.weather.PrecipType
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.location.*
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -43,10 +44,10 @@ import com.sssoyalan.newsapp.MainViewModelFactory
 import com.sssoyalan.newsapp.R
 import com.sssoyalan.newsapp.adapters.BorsaAdapter
 import com.sssoyalan.newsapp.db.ArticleDatabase
-import com.sssoyalan.newsapp.generic.Constants
-import com.sssoyalan.newsapp.generic.Constants.*
-import com.sssoyalan.newsapp.models.Borsalar
+import com.sssoyalan.newsapp.helpers.Constants
+import com.sssoyalan.newsapp.helpers.Constants.*
 import com.sssoyalan.newsapp.models.Resource
+import com.sssoyalan.newsapp.models.borsa.Borsalar
 import com.sssoyalan.newsapp.models.users.UserModel
 import com.sssoyalan.newsapp.source.DataRepository
 import kotlinx.android.synthetic.main.activity_main.*
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var appBar: AppBarLayout
     lateinit var actionBarDrawerToggle : ActionBarDrawerToggle
     private lateinit var drawerLayout : DrawerLayout
-    val PERMISSION_ID = 42
+    private val PERMISSION_ID = 42
     lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
 
@@ -82,21 +83,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             it.title=""
         }
         setSupportActionBar(toolbar)
-
         appBar = findViewById(R.id.app_bar)
-
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
-
         drawerLayout = findViewById(R.id.my_drawer_layout)
         actionBarDrawerToggle =
             ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        getLastLocation()
 
+        val sharedPreferences = this.getSharedPreferences(
+            packageName,
+            android.content.Context.MODE_PRIVATE
+        )
+        val cityName = sharedPreferences.getString("city", null)
+        val dataRepository = DataRepository(ArticleDatabase(this))
+        val mainViewModelFactory =
+            MainViewModelFactory(
+                dataRepository
+            )
+        viewModel = ViewModelProvider(this, mainViewModelFactory).get(MainViewModel::class.java)
+
+        if (cityName==null){
+            getLastLocation()
+        }else{
+            goResfreshWeather(null, null, cityName)
+        }
 
         val googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this)
         if (googleSignInAccount!=null){
@@ -126,20 +139,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val username = headerView.findViewById<TextView>(R.id.username)
         val email = headerView.findViewById<TextView>(R.id.userEmail)
         val photoUri = headerView.findViewById<ImageView>(R.id.profile_image)
-
         username.text= USER_NAME
         email.text= USER_EMAIL
         Glide.with(this).load(USER_IMG_URL).into(photoUri)
-
         nav.setNavigationItemSelectedListener(this)
 
-        val dataRepository = DataRepository(ArticleDatabase(this))
-        val mainViewModelFactory =
-            MainViewModelFactory(
-                dataRepository
-            )
-
-        viewModel = ViewModelProvider(this, mainViewModelFactory).get(MainViewModel::class.java)
         val mPrefs = this.getSharedPreferences("pref", Context.MODE_PRIVATE)
         SPEED =  mPrefs.getInt("speed", 20)
         REVERSE = mPrefs.getBoolean("reverse", false)
@@ -149,8 +153,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setupWithNavController(navController)
         navView.itemIconTintList = null
         navView.itemTextColor = null
-
-        goRefresh()
+        circle_imageView_logo.setOnClickListener {
+            val view: View = navView.findViewById(R.id.navigation_home)
+            navView.animate().translationY(0f).setInterpolator(
+                DecelerateInterpolator(
+                    2f
+                )
+            ).start()
+            view.performClick()
+        }
+        main_weather.setOnClickListener {
+            val view: View = navView.findViewById(R.id.navigation_weather)
+            navView.animate().translationY(0f).setInterpolator(
+                DecelerateInterpolator(
+                    2f
+                )
+            ).start()
+            view.performClick()
+        }
+        goRefresh(false)
         lastSeenUpdate("1")
     }
 
@@ -172,22 +193,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lastSeenUpdate("1")
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         val time : Long = Timestamp.now().toDate().time
         lastSeenUpdate(time.toString())
     }
 
-    fun goRefresh() {
+    fun goRefresh(isRefresh: Boolean) {
+        val layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        var positionIndex : Int =0
+        var topView : Int = 0
+        if(isRefresh){
+            positionIndex = (recyc_main.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+            val startView: View = recyc_main.getChildAt(0)
+            topView = if (startView == null) 0 else startView.top - recyc_main.paddingTop
+        }
         viewModel.aliveDataBorsa.observe(this) {
             recyc_main.adapter = BorsaAdapter(it)
-            recyc_main.layoutManager = LinearLayoutManager(
-                this,
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
+            recyc_main.layoutManager = layoutManager
             recyc_main.isLoopEnabled = true
             startScroll()
+            if (isRefresh){
+                (recyc_main.layoutManager as LinearLayoutManager).scrollToPosition(positionIndex)
+            }
             recyc_main.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
@@ -249,10 +281,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val cb_online = bottomSheetView.findViewById(R.id.cb_son_gorulme) as CheckBox
         val cancelBtn = bottomSheetView.findViewById(R.id.cancel_btn) as AppCompatImageButton
         val saveBtn = bottomSheetView.findViewById(R.id.save_btn) as AppCompatImageButton
-
         seekBar.progress = SPEED /10
         tv_speed.text = seekBar.progress.toString()+"x"
-
         val firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
         val docIdRef: DocumentReference = firestore.collection("users").document(USER_ID)
         docIdRef.get().addOnSuccessListener {
@@ -261,7 +291,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 cb_online.isChecked = it.getString("onlineCheck")=="1"
             }
         }
-
         if (!REVERSE){
             tv_yon.text = "Sol"
             radioBtnLeft.setTextColor(resources.getColor(R.color.black2))
@@ -294,7 +323,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 radioBtnLeft.setTextColor(resources.getColor(R.color.white))
             }
         }
-
         cancelBtn.setOnClickListener {
             bottomSheetDialog.dismiss()
         }
@@ -311,10 +339,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             firestore.collection("users").document(USER_ID)
-                .update(mapOf(
+                .update(
+                    mapOf(
                         "userEmailCheck" to isEmail,
                         "onlineCheck" to isOnline
-                ))
+                    )
+                )
                 .addOnSuccessListener { Log.d("TAG", "DocumentSnapshot successfully updated!") }
                 .addOnFailureListener { e -> Log.w("TAG", "Error updating document", e) }
 
@@ -331,7 +361,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-
     }
 
     private fun lastSeenUpdate(s: String){
@@ -345,7 +374,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START)
                 }
-                val view : View = navView.findViewById(R.id.navigation_profile)
+                val view: View = navView.findViewById(R.id.navigation_profile)
                 navView.animate().translationY(0f).setInterpolator(
                     DecelerateInterpolator(
                         2f
@@ -364,6 +393,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     drawerLayout.closeDrawer(GravityCompat.START)
                 }
                 FirebaseAuth.getInstance().signOut()
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+                val googleSignInClient = GoogleSignIn.getClient(this, gso)
+                googleSignInClient.signOut()
                 val intent = Intent(applicationContext, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -376,16 +408,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
-
                 mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
                     var location: Location? = task.result
                     if (location == null) {
                         requestNewLocationData()
                     } else {
-//                        findViewById<TextView>(R.id.latTextView).text = location.latitude.toString()
-//                        findViewById<TextView>(R.id.lonTextView).text = location.longitude.toString()
-                        /*Buradan istek atmalıyım mal değilsem eğer.*/
-                        goResfreshWeather(location.latitude.toString(), location.longitude.toString())
+                        goResfreshWeather(
+                            location.latitude.toString(),
+                            location.longitude.toString(),
+                            null
+                        )
                         Log.d(
                             "TAGsss",
                             "${location.latitude.toString()} => ${location.longitude.toString()}"
@@ -393,11 +425,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
             } else {
-                Toast.makeText(
-                    this,
-                    "Konum bilgisini açmanız gerekli",
-                    Toast.LENGTH_LONG
-                ).show()
+
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(intent)
             }
@@ -407,28 +435,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     @SuppressLint("SetTextI18n")
-    fun goResfreshWeather(lat: String, lon: String) {
-        viewModel.getWeatherData(lat, lon)
+    fun goResfreshWeather(lat: String?, lon: String?, city: String?) {
+        viewModel.getWeatherData(lat, lon, city)
         viewModel.aliveDataWeather.observe(this, androidx.lifecycle.Observer {
             when (it) {
                 is Resource.Success -> {
                     if (it.data != null) {
-
-                        when  {
+                        when {
                             it.data.weather[0].main.toString().contains("Clear") -> {
                                 circle_imageView_effect.setBackgroundResource(R.drawable.sun_effect)
                             }
                             it.data.weather[0].main.toString().contains("Smoke") -> {
                                 circle_imageView_effect.setBackgroundResource(R.drawable.smoke_effect)
                             }
+                            it.data.weather[0].main.toString().contains("Cloud") -> {
+                                circle_imageView_effect.setBackgroundResource(R.drawable.cloud_effect)
+                            }
+                            it.data.weather[0].main.toString().contains("Haze") -> {
+                                circle_imageView_effect.setBackgroundResource(R.drawable.smoke_effect)
+                            }
                         }
 
-                        Glide.with(this)
-                            .load("https://openweathermap.org/img/wn/" + it.data.weather[0].icon.toString() + "@2x.png")
-                            .into(
-                                circle_imageView_main
-                            )
-                        main_degree.text= String.format("%.2f ℃",it.data.main.temp-272.15)
+                        if (!it.data.weather[0].main.toString().contains("Clear")) {
+                            Glide.with(this)
+                                .load("https://openweathermap.org/img/wn/" + it.data.weather[0].icon.toString() + "@2x.png")
+                                .into(
+                                    circle_imageView_main
+                                )
+                        }
+                        main_degree.text = String.format("%.1f ℃", it.data.main.temp - 272.15)
                     }
                 }
                 is Resource.Error -> {
@@ -451,7 +486,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mLocationRequest.interval = 0
         mLocationRequest.fastestInterval = 0
         mLocationRequest.numUpdates = 1
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mFusedLocationClient.requestLocationUpdates(
             mLocationRequest, mLocationCallback,
@@ -462,7 +496,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             var mLastLocation: Location = locationResult.lastLocation
-            goResfreshWeather(mLastLocation.latitude.toString(), mLastLocation.longitude.toString())
+            goResfreshWeather(
+                mLastLocation.latitude.toString(),
+                mLastLocation.longitude.toString(),
+                null
+            )
         }
     }
 
@@ -511,6 +549,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
     }
+
+    fun isWeather() {
+        navView.setBackgroundColor(Color.TRANSPARENT)
+        main_borsa.visibility=View.GONE
+    }
+
+    fun isNotWeather() {
+        navView.setBackgroundColor(Color.parseColor("#2b2b2b"))
+        main_borsa.visibility=View.VISIBLE
+    }
+
 
 }
 

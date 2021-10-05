@@ -30,9 +30,7 @@ import com.sssoyalan.newsapp.MainViewModelFactory
 import com.sssoyalan.newsapp.R
 import com.sssoyalan.newsapp.databinding.ActivityLoginBinding
 import com.sssoyalan.newsapp.db.ArticleDatabase
-import com.sssoyalan.newsapp.generic.VersionChecker
-import com.sssoyalan.newsapp.models.Article
-import com.sssoyalan.newsapp.models.Source
+import com.sssoyalan.newsapp.helpers.VersionChecker
 import com.sssoyalan.newsapp.models.users.Okunan
 import com.sssoyalan.newsapp.models.users.UserModel
 import com.sssoyalan.newsapp.models.users.lastReadArticle
@@ -86,7 +84,6 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
         dialog.show()
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,22 +120,18 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
                 val firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
                 val docIdRef: DocumentReference = firestore.collection("yourCollection").document(
-                    account.id.toString()
+                    account.id
                 )
                 docIdRef.get().addOnCompleteListener(OnCompleteListener {
                     if (it.isSuccessful) {
                         val document: DocumentSnapshot? = it.result
-                        if (document?.exists() == true) {
+                        if (document != null) {
                             Log.d(TAG, "Document exists!")
                         } else {
                             viewModel.saveUser(
@@ -159,7 +152,6 @@ class LoginActivity : AppCompatActivity() {
                 })
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
                 Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
             }
         }
@@ -169,13 +161,9 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
                     updateUI(user)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
                     updateUI(null)
                 }
             }
